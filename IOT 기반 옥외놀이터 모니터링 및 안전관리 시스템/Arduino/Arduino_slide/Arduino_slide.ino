@@ -214,7 +214,7 @@ void loop() {
      //Serial.println(person[0][1]);
      sendstatemessage();
 }
-/////////////////////////////////////////////////
+/////////DB로 데이터 보내기
 void sendmessage(){
   String sendmessage="";
   UDP.beginPacket(ip,port);
@@ -236,7 +236,7 @@ void sendmessage(){
   strcpy(packetBuffer,sendmessage);
   UDP.write(ptr);
   UDP.endPacket();
-}
+}////////////관리자화면으로 데이터 보내기
 void sendstatemessage(){
   String sendmessage="";
   UDP2.beginPacket(ip,port2);
