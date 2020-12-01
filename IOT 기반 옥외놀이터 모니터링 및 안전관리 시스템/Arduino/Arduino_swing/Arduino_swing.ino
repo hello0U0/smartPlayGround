@@ -31,10 +31,13 @@ WiFiUDP UDP2;
 WiFiClient client;
 
 /////////////////////////////////////////////////////////////////////////////////
-void connectTCPHost();
 void sendmessage();
 void sendstatemessage();
-void connectWiFiWPA();
+void caltime();
+void settime();
+int month_to_digit(char* str);
+int day_to_digit(char* str);
+String getTime();
 //////////////////////////////////////////////////////////////////////////////////////
 const char *month_arr[13] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 const char *day_arr[7] = {"Sun", "Mon", "Tue", "Wen", "Thu", "Fri", "Sat"};
@@ -51,26 +54,17 @@ int minute;
 int second;
 int ms;
 String realtime;
-
 unsigned long lasttime;
-///////////////////////////////////////////////////////////////////
-void caltime();
-void settime();
-int month_to_digit(char* str);
-int day_to_digit(char* str);
-String getTime();
-//////////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////////////
 void buttonReset();
 void buttonLoop();
 void blongpressed();
 void bpressed();
 void breleased();
-
-int prev_state=0;
-int state=0;
-int upThreshold=0;
+//////////////////////////////////////////////////////////////////////////////////
+int prev_state=0;       //이전상태
+int state=0;            //현재상태
+int upThreshold=0;      //
 int pressed=1;
 int released=0;
 int isstop=1;
@@ -85,22 +79,17 @@ unsigned long nowtime;
 bool pressed_triggered = false;
 bool longclick_detected = false;
 
-
 int counter=0;
 /////////////////////////////////////////////////////////////////////////////////////
 void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, password);
-  Serial.println();
-  Serial.println("Waiting for connection and IP Address from DHCP");
+  delay(500);
+  //시작
   while (WiFi.status() != WL_CONNECTED) {
     delay(2000);
-    Serial.print(".");
   }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  //Serial.println(WiFi.localIP());
   UDP.begin(port);
   UDP2.begin(port2);
   buttonReset();
@@ -110,44 +99,34 @@ void loop() {
   buttonLoop();
 }
 /////////////////////////////////////////////
-void blongpressed(){
+void blongpressed(){ //멈추면 정보 전송
   sendmessage();
-}
-void bpressed(){
-}
-void breleased(){
-}
-void buttontest(){
-  prev_state = state;
-  state = digitalRead(pin);
-  Serial.println(state);
 }
 ////////////////////////////////////////////////////////////////////////////
 void buttonLoop(){
+  //이전상태 및 현재 상태 저장
   prev_state = state;
   state = digitalRead(pin);
-  //upThreshold=digitalRead(up_pin);
   nowtime=micros();
   //센서 안으로
   if (prev_state == pressed && state == released) {         
     down_ms = nowtime;
     pressed_triggered = false;
-    bpressed();
+    ishigh=0;
   } //센서 밖으로
   else if (prev_state == released && state == pressed&&ispressed) {
     down_time_ms = nowtime - down_ms;
+    //높이 올라가면
     if(10000<down_time_ms&&down_time_ms<upthreshold){
       swingcase=2;
       ishigh=1;
     }
     if (down_time_ms >= debounce_time_ms) {
-      breleased();
       ispressed=0;
     }
   }
   //제대로 센서 밖으로 ------ if()시작함
-  else if (state == released && !pressed_triggered && (micros() - down_ms >= debounce_time_ms)) {
-    bpressed();
+  else if (state == released && !pressed_triggered && (nowtime - down_ms >= debounce_time_ms)) {
     ispressed=1;
     pressed_triggered = true;
     if(isstop==1){
@@ -155,19 +134,15 @@ void buttonLoop(){
       click_ms = down_ms;
     }
   }//멈춤
-  else if (state == released &&pressed_triggered&& (micros() - down_ms >= LONGCLICK_MS)&&!isstop) {
+  else if (state == released &&pressed_triggered&& (nowtime - down_ms >= LONGCLICK_MS)&&!isstop) {
     isstop=1;
     caltime();
     usetime=nowtime-click_ms;
     if(swingcase==0)swingcase=1;
     blongpressed();
     swingcase=0;
-    
-  }//센서 밖에서 높이 올라가면
-  /*else if(state == released &&pressed_triggered&&upThreshold==released){
-    Serial.println("너무 높이 올라감");
-    swingcase=2;
-  }*/
+  }
+  //실시간 정보 전송
   sendstatemessage();
   yield();
 }
@@ -193,11 +168,11 @@ void sendmessage(){
   sendmessage+="/";
   sendmessage+=String(usetime);
   sendmessage+="/";
-  char packetBuffer[255]={0};
+  //char packetBuffer[255]={0};
   std::vector<char> writable(sendmessage.begin(), sendmessage.end());
   writable.push_back('\0');
   char* ptr = &writable[0];
-  strcpy(packetBuffer,sendmessage);
+  //strcpy(packetBuffer,sendmessage);
   UDP.write(ptr);
   UDP.endPacket();
 }
@@ -208,28 +183,13 @@ void sendstatemessage(){
   sendmessage+="/";
   sendmessage+=String(ishigh);
   sendmessage+="/";
-  char packetBuffer[255]={0};
+  //char packetBuffer[255]={0};
   std::vector<char> writable(sendmessage.begin(), sendmessage.end());
   writable.push_back('\0');
   char* ptr = &writable[0];
-  strcpy(packetBuffer,sendmessage);
+  //strcpy(packetBuffer,sendmessage);
   UDP.write(ptr);
   UDP.endPacket();
-}
-void connectWiFiWPA(){
-  
-}
-void connectTCPHost(){
-  Serial.print("connecting to ");
-  Serial.println(host);
-  // Use WiFiClient class to create TCP connections
-  const int httpPort = port;
-  while(!client.connect(ip, port))
-  {
-    Serial.println("connection failed");
-    delay(1000);
-  }
-  Serial.println("connection successed");
 }
 void settime(){
   String str_time = getTime();
@@ -326,15 +286,13 @@ int day_to_digit(char* str) {
 String getTime() {
   WiFiClient client;
   while (!!!client.connect("google.com", 80)) {
-      Serial.println("connection failed, retrying...");
+      delay(100);
+      //Serial.println("connection failed, retrying...");
   }
- 
   client.print("HEAD / HTTP/1.1\r\n\r\n");
- 
   while(!!!client.available()) {
      yield();
   }
- 
   while(client.available()){
     if (client.read() == '\n') {    
       if (client.read() == 'D') {    

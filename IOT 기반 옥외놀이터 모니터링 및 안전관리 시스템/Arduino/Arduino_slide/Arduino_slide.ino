@@ -6,29 +6,31 @@ extern "C" {
 }
 #define middleTh 10000000
 #define threshold 1000
-
-<<<<<<< HEAD
-/////////////////////write playid////////////////////
-=======
+int pin_A=D4;
+int pin_B=D5;
+int pin_C=D6;
+int pin_D=D7;
 /////////////////////write playid///////////////////
->>>>>>> e958850bc3de58f9f01347eb69ddd100838b8f61
 #define playid 0
 /////////////////////write WiFi//////////////////////
-static const char* ssid = "";//와이파이
-static const char* password = "";//비번
+static const char* ssid = "EWHA-IOT";//와이파이
+static const char* password = "dscho007";//비번
 ////////////////////write ip////////////////////////////////
-const char* host = "0,0,0,0";
-byte ip[]={0,0,0,0};
-int port=8200;
+const char* host = "192,168,0,35";
+byte ip[]={192,168,0,35};
+int port=8100;
 int port2=8300;
 
 WiFiUDP UDP;
 WiFiUDP UDP2;
 WiFiClient client;
 /////////////////////////////////////////////////////////////////////////////////
-void connectTCPHost();
 void sendmessage();
-void connectWiFiWPA();
+void caltime();
+void settime();
+int month_to_digit(char* str);
+int day_to_digit(char* str);
+String getTime();
 //////////////////////////////////////////////////////////////////////////////////////--세팅 같음
 const char *month_arr[13] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 const char *day_arr[7] = {"Sun", "Mon", "Tue", "Wen", "Thu", "Fri", "Sat"};
@@ -47,15 +49,9 @@ int ms;
 String realtime;
 
 unsigned long lasttime;
-///////////////////////////////////////////////////////////////////
-void caltime();
-void settime();
-int month_to_digit(char* str);
-int day_to_digit(char* str);
-String getTime();
 //////////////////////////////////////////////////////////////////
-unsigned long starttime, usetime;
 
+unsigned long starttime, usetime;
 unsigned long nowtime;
 unsigned long down_ms[4];
 unsigned long up_ms[4];
@@ -63,7 +59,6 @@ bool tryOut[4]={0};
 bool doing[4]={0};
 int prev_A, prev_B, prev_C, prev_D;
 int A, B, C, D;
-
 int person[5][2]={0};//state
 int upstate=0;
 int downstate=8;
@@ -72,18 +67,11 @@ int downstate=8;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  
+  delay(500);
   WiFi.begin(ssid, password);
-  Serial.println();
-  Serial.println("Waiting for connection and IP Address from DHCP");
   while (WiFi.status() != WL_CONNECTED) {
     delay(2000);
-    Serial.print(".");
   }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
   UDP.begin(port);
   UDP2.begin(port2);
   settime();
@@ -94,6 +82,7 @@ void setup() {
 }
 void loop() {
   nowtime=micros();
+  //이전상태 및 현재상태 저장
   prev_A=A;
   prev_B=B;
   prev_C=C;
@@ -102,12 +91,8 @@ void loop() {
   B=digitalRead(pin_B);
   C=digitalRead(pin_C);
   D=digitalRead(pin_D);
-  //Serial.print(A);
-  //Serial.print(B);
-  //Serial.print(C);
-  //Serial.println(D);
-  //Serial.print(person[0][0]);
-  //Serial.println(person[0][1]);
+  
+  //A,B,C,D의 현재 , 이전상태들로 현재 사람이 어디에 위치하는지 판단
   if(prev_A==1 && A==0){///////A인식
     if(upstate==0||upstate==4) upstate=1;
     else if(upstate==3) upstate=2;
@@ -136,10 +121,7 @@ void loop() {
     if(downstate==7) downstate=8;
     else if(downstate==6) downstate=5;
   }
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
-  //Serial.print(upstate);
-  //Serial.print(downstate);
-  
+    //현재 상태와 이전상태를 이용하여 사람이 어떤 case의 이용중인지 판단
    if(person[0][0]==0&&upstate==1){////////////////////////////위에서 아래 시작
       person[0][0]=1;
       person[0][1]=1;
@@ -174,8 +156,6 @@ void loop() {
         else if(person[0][1]==5) {}//person[0][1]=2;
       }
     }
-    
-    
     else if(person[0][0]==0&&downstate==7){////////////////////////////////////////아래에서 위 시작
       person[0][0]=7;
       person[0][1]=3;
@@ -210,15 +190,16 @@ void loop() {
         else if(person[0][1]==5) person[0][1]=2;
       }
     }
+    
     if(person[0][0]==4&&nowtime-starttime>middleTh){
       if(person[0][1]==1) person[0][1]=5;
       else if(person[0][1]==3) person[0][1]=6;
     }
-     //Serial.print(person[0][0]);
-     //Serial.println(person[0][1]);
+
+    //현재 상태 전송
      sendstatemessage();
 }
-/////////DB로 데이터 보내기
+/////////////////////////////////////////////////
 void sendmessage(){
   String sendmessage="";
   UDP.beginPacket(ip,port);
@@ -233,14 +214,15 @@ void sendmessage(){
   sendmessage+="/";
   sendmessage+=String(usetime);
   sendmessage+="/";
-  char packetBuffer[255]={0};
+  //char packetBuffer[255]={0};
   std::vector<char> writable(sendmessage.begin(), sendmessage.end());
   writable.push_back('\0');
   char* ptr = &writable[0];
-  strcpy(packetBuffer,sendmessage);
+  //strcpy(packetBuffer,sendmessage);
   UDP.write(ptr);
   UDP.endPacket();
-}////////////관리자화면으로 데이터 보내기
+  Serial.println(ptr);
+}
 void sendstatemessage(){
   String sendmessage="";
   UDP2.beginPacket(ip,port2);
@@ -252,28 +234,14 @@ void sendstatemessage(){
   sendmessage+="/";
   sendmessage+=String(D);
   sendmessage+="/";
-  char packetBuffer[255]={0};
+  //char packetBuffer[255]={0};
   std::vector<char> writable(sendmessage.begin(), sendmessage.end());
   writable.push_back('\0');
   char* ptr = &writable[0];
-  strcpy(packetBuffer,sendmessage);
+  //strcpy(packetBuffer,sendmessage);
   UDP2.write(ptr);
   UDP2.endPacket();
-}
-void connectWiFiWPA(){
-  
-}
-void connectTCPHost(){
-  Serial.print("connecting to ");
-  Serial.println(host);
-  // Use WiFiClient class to create TCP connections
-  const int httpPort = port;
-  while(!client.connect(ip, port))
-  {
-    Serial.println("connection failed");
-    delay(1000);
-  }
-  Serial.println("connection successed");
+  //Serial.println(ptr);
 }
 void settime(){
   String str_time = getTime();
@@ -372,7 +340,6 @@ String getTime() {
   while (!!!client.connect("google.com", 80)) {
       Serial.println("connection failed, retrying...");
   }
- 
   client.print("HEAD / HTTP/1.1\r\n\r\n");
  
   while(!!!client.available()) {
