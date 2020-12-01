@@ -7,7 +7,11 @@ extern "C" {
 #define middleTh 10000000
 #define threshold 1000
 
+<<<<<<< HEAD
 /////////////////////write playid////////////////////
+=======
+/////////////////////write playid///////////////////
+>>>>>>> e958850bc3de58f9f01347eb69ddd100838b8f61
 #define playid 0
 /////////////////////write WiFi//////////////////////
 static const char* ssid = "";//와이파이
