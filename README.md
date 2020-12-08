@@ -22,7 +22,7 @@ IOTProcessing : Processing 서버 구축과 DB 접근 및 데이터 가공, 관�
 
 프로젝트 예상 구조도
 
-
+<img width="560" alt="시스템구조도" src="https://user-images.githubusercontent.com/50941201/101448675-cd61fe00-396a-11eb-82ab-c2633d0dda5b.PNG">
 각 놀이터에는 그네와 미끄럼틀에 esp8266 D1보드가 부착되어 있다. 그네는 IR트래킹 센서를 이용하였고 미끄럼틀은 조도 센서와 레이저 센서를 사용함. 수집한 정보는 공유기를 통해 관리자 화면으로 전달되고 데이터베이스에 저장된다. 
 
 프로젝트 아키텍처
