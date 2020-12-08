@@ -29,7 +29,7 @@ IOTProcessing : Processing 서버 구축과 DB 접근 및 데이터 가공, 관�
 <img width="406" alt="미끄럼틀회로" src="https://user-images.githubusercontent.com/50941201/101448680-d05cee80-396a-11eb-8625-fa43f035a17a.PNG">
  미끄럼틀에 4개의 조도센서와 레이저센서, Esp8266 D1 R1보드 사용
 
-<img width="406" alt="그네회로" src="https://user-images.githubusercontent.com/50941201/101448688-d2bf4880-396a-11eb-84a2-fb08a62a0ecf.PNG">
+<img width="450" alt="그네회로" src="https://user-images.githubusercontent.com/50941201/101448688-d2bf4880-396a-11eb-84a2-fb08a62a0ecf.PNG">
 IR트래킹센서, Esp8266 D1 R1보드 사용
 
 
