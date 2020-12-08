@@ -34,9 +34,9 @@ IR트래킹센서, Esp8266 D1 R1보드 사용
 
 
 ## 구현 참고 자료
-아두이노 :  https://wikidocs.net/book/2655, https://github.com/LennartHennigs/Button2.git 의 내용을 참고함
- DB : https://wikidocs.net/book/1530 의 내용을 참고함
- html : https://p5js.org/ko/ 의 내용을 참고함
+아두이노 :  https://wikidocs.net/book/2655, https://github.com/LennartHennigs/Button2.git 의 내용을 참고함<br>
+ DB : https://wikidocs.net/book/1530 의 내용을 참고함<br>
+ html : https://p5js.org/ko/ 의 내용을 참고함<br>
 
 ## 참여자
 김소림 이효정 현재정
