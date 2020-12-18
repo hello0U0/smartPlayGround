@@ -51,7 +51,6 @@ IOTProcessing : Processing 서버 구축과 DB 접근 및 데이터 가공, 관�
 * 이화여자대학교 - SW창업경진대회 - 장려상
 * 양천구청-양천구 스마트시티 아이디어 공모전 - 장려상
 * 이화여자대학교 - 캡스톤디자인경진대회 - 장려상
-* 관악구청- 관악구 스마트도시 정책 아이디어 공모전- 내용 추가
 
 ##  License 표시
 GNU(Gnu is Not Unix), General Public License(GPL)
