@@ -38,13 +38,11 @@ IOTProcessing : Processing 서버 구축과 DB 접근 및 데이터 가공, 관�
  DB : https://wikidocs.net/book/1530 의 내용을 참고함<br>
  html : https://p5js.org/ko/ 의 내용을 참고함<br>
 
-## 참여자
-김소림 이효정 현재정
   
 ## 기술 블로그
-* 김소림 https://blog.naver.com/ksr10217/222166393428 </p>
-* 이효정 https://blog.naver.com/lhj97033/222146681749</p>
-* 현재정 https://blog.naver.com/wowjd123589/222160705266</p>
+* https://blog.naver.com/ksr10217/222166393428 </p>
+* https://blog.naver.com/lhj97033/222146681749</p>
+* https://blog.naver.com/wowjd123589/222160705266</p>
 
 ## 수상실적
 * 강서구청 - 강서구 스마트도시 아이디어 공모전 - 장려상
